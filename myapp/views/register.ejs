@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <%= error %>
+    <div class="row" style="width: 200px; margin: auto; margin-top: 100px;">
+      <form action="/" method="POST">
+        <div class="form-group">
+          <label class="control-label col-sm-2">name</label>
+          <div class="col-xs-5">
+            <input class="form-control" name="name" type="text" />
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="control-label col-sm-2">email</label>
+          <div class="col-xs-5">
+            <input class="form-control" name="email" type="email" />
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="control-label col-sm-2">password</label>
+          <div class="col-xs-5">
+            <input class="form-control" name="password" type="password" />
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="control-label col-sm-2">passwordconform</label>
+          <div class="col-xs-5">
+            <input class="form-control" name="confirm" type="password" />
+          </div>
+        </div>
+        <div class="form-group col-xs-5">
+          <input class="btn btn-primary w-100" type="submit" value="register" />
+        </div>
+      </form>
+    </div>
+  </body>
+</html>

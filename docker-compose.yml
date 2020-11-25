@@ -1,6 +1,22 @@
 version: '3'
 
 services:
+  db_mysql:
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: mysql-db
+      TZ: 'Asia/Tokyo'
+    image: mysql:5.7
+    container_name: db_mysql
+    hostname: db_mysql
+    command: mysqld --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+    volumes:
+      - ./docker/db/my.cnf:/etc/mysql/conf.d/my.cnf
+      - ./docker/db/sql:/docker-entrypoint-initdb.d
+    ports:
+      - '3306:3306'
+    networks:
+      - my-network
   app:
     image: node:12
     container_name: node-js
@@ -13,17 +29,15 @@ services:
     volumes:
       - ./myapp:/app
     working_dir: /app
+    # command: sh -c'./wait-for-it.sh; npm start'
     command: npm start
-  db:
-    environment:
-      MYSQL_USER: root
-      MYSQL_ALLOW_EMPTY_PASSWORD: root
-      MYSQL_DATABASE: mysql-db
-      TZ: 'Asia/Tokyo'
-    image: mysql:5.7
-    container_name: db_mysql
-    command: mysqld --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
-    volumes:
-      - ./docker/db/my.cnf:/etc/mysql/conf.d/my.cnf
-    ports:
-      - 3306:3306
+    depends_on: 
+      - 'db_mysql'
+    networks:
+      - my-network
+networks:
+  my-network:
+    external: true
+# networks:
+#   my-network:
+#     driver: bridge
