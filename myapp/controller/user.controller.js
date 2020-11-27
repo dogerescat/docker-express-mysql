@@ -1,7 +1,8 @@
 const User = require('../model/user');
 const jwt = require('jsonwebtoken');
 const { validationResult } = require('express-validator');
-const quesryString = require('querystring');
+require('dotenv').config();
+const env = process.env;
 
 module.exports = {
   register: (req, res) => {
@@ -14,20 +15,27 @@ module.exports = {
     const results = validationResult(req);
     if (!results.isEmpty()) {
       res.render('register.ejs', { error: results.errors[0].msg, info: null });
-    } else {
-      User.createUser(req.body, (error, result) => {
-        if (error) {
-          console.log(error);
-          res.redirect('/');
-        } else {
-          const query = quesryString.stringify({
-            name: req.body.name,
-            email: req.body.email,
-          });
-          res.redirect('/post?' + query);
-        }
-      });
+      return;
     }
+    User.createUser(req.body, (error, result) => {
+      if (error) {
+        console.log(error);
+        res.redirect('/');
+        return;
+      }
+      const payload = {
+        name: req.body.name,
+        email: req.body.email,
+        password: req.body.password
+      };
+      const option = {
+        algorithm: 'HS256',
+        expiresIn: '1h',
+      };
+      const token = jwt.sign(payload, env.SELECT_KEY, option);
+      req.session.accessToken = `Bearer ${token}`
+      res.redirect('/post');
+    });
   },
   authentication: (req, res) => {
     const results = validationResult(req);
@@ -38,32 +46,29 @@ module.exports = {
     User.findUser(req.body.email, req.body.password, (error, result) => {
       if (result.length === 0) {
         res.redirect('/login');
-      } else {
-        const query = quesryString.stringify({
-          name: result[0].name,
-          email: result[0].email,
-        });
-        res.redirect('/post?' + query);
+        return;
       }
-    });
-  },
-  post: (req, res) => {
-    if (!req.query.name || !req.query.email) {
-      res.redirect('/login');
-    } else {
-      const query = req.query;
       const payload = {
-        name: query.name,
-        email: query.email,
+        name: result[0].name,
+        email: result[0].email,
+        password: result[0].password
       };
-      const SELECT_KEY = 'select';
       const option = {
         algorithm: 'HS256',
         expiresIn: '1h',
       };
-      const token = jwt.sign(payload, SELECT_KEY, option);
-      res.setHeader('token', token);
-      res.render('post.ejs', { info: query.name });
-    }
+      const token = jwt.sign(payload, env.SELECT_KEY, option);
+      req.session.accessToken = `Bearer ${token}`
+      res.redirect('/post');
+
+    });
+  },
+  logout: (req, res) => {
+    delete req.session.accessToken;
+    res.redirect('/login');
+  },
+  post: (req, res) => {
+    res.setHeader('token', req.token);
+    res.render('post.ejs', { info: req.decoded.name });
   },
 };

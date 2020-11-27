@@ -1,15 +1,15 @@
 const connection = require('./db');
 
 module.exports = {
-  createUser: function (body, callback) {
+  createUser: (body, callback) => {
     connection.query(
       `INSERT INTO user SET name = '${body.name}', email = '${body.email}', password = '${body.password}'`,
       callback
     );
   },
-  findOne: (email, name, callback) => {
+  findOne: (email, name, password, callback) => {
     connection.query(
-      `select * from user where email = '${email}' and name = '${name}'`,
+      `select * from user where email = '${email}' and name = '${name}' and password = '${password}'`,
       callback
     );
   },

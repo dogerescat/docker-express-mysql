@@ -1,21 +1,29 @@
-var createError = require('http-errors');
-var express = require('express');
-var path = require('path');
-var cookieParser = require('cookie-parser');
-var logger = require('morgan');
+const createError = require('http-errors');
+const express = require('express');
+const path = require('path');
+const cookieParser = require('cookie-parser');
+const logger = require('morgan');
 const multipart = require('connect-multiparty');
 const expressLayouts = require('express-ejs-layouts');
 const bodyParser = require('body-parser');
 const passport = require('passport');
-var userRouter = require('./routes/user');
-var app = express();
+const userRouter = require('./routes/user');
+const app = express();
+const session = require('express-session');
 
 app.use(multipart());
 app.use(expressLayouts);
 app.use(passport.initialize());
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
-
+app.use(session({
+  secret: 'secret',
+  resave: false,
+  saveUninitialized: false,
+  cookie: {
+    maxAge: 30 * 60 * 1000
+  }
+}))
 app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
