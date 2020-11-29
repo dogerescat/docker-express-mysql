@@ -7,3 +7,13 @@ CREATE TABLE IF NOT EXISTS `user` (
     `password` VARCHAR(20) NOT NULL,
     PRIMARY KEY (`id`)
 )DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
+
+DROP TABLE IF EXISTS `post`;
+
+CREATE TABLE IF NOT EXISTS `post` (
+    `id` INT(20) AUTO_INCREMENT,
+    `title` VARCHAR(20) NOT NULL,
+    `contents` VARCHAR(140) NOT NULL,
+    `user_id` INT(20) NOT NULL,
+    PRIMARY KEY (`id`)
+)DEFAULT CHARSET=utf8 COLLATE=utf8_bin;

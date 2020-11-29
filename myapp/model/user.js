@@ -7,6 +7,9 @@ module.exports = {
       callback
     );
   },
+  get: (callback) => {
+    connection.query(`select * from user`, callback);
+  },
   findOne: (email, name, password, callback) => {
     connection.query(
       `select * from user where email = '${email}' and name = '${name}' and password = '${password}'`,

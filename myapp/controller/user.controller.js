@@ -6,41 +6,49 @@ const env = process.env;
 
 module.exports = {
   register: (req, res) => {
-    res.render('register.ejs', { error: '', info: null });
+    res.render('register.ejs', { info: null });
   },
   login: (req, res) => {
-    res.render('login.ejs', { error: '', info: null });
+    res.render('login.ejs', { info: null });
   },
   create: (req, res) => {
-    const results = validationResult(req);
-    if (!results.isEmpty()) {
-      res.render('register.ejs', { error: results.errors[0].msg, info: null });
+    const validationErrors = validationResult(req);
+    if (!validationErrors.isEmpty()) {
+      req.flash('errors', validationErrors.errors[0].msg);
+      res.redirect('/');
       return;
     }
     User.createUser(req.body, (error, result) => {
       if (error) {
-        console.log(error);
         res.redirect('/');
         return;
       }
-      const payload = {
-        name: req.body.name,
-        email: req.body.email,
-        password: req.body.password
-      };
-      const option = {
-        algorithm: 'HS256',
-        expiresIn: '1h',
-      };
-      const token = jwt.sign(payload, env.SELECT_KEY, option);
-      req.session.accessToken = `Bearer ${token}`
-      res.redirect('/post');
+      User.findUser(req.body.email, req.body.password, (err, results) => {
+        if (err) {
+          res.redirect('/login');
+          return;
+        }
+        const payload = {
+          id: results[0].id,
+          name: results[0].name,
+          email: results[0].email,
+          password: results[0].password
+        };
+        const option = {
+          algorithm: 'HS256',
+          expiresIn: '1h',
+        };
+        const token = jwt.sign(payload, env.SELECT_KEY, option);
+        req.session.accessToken = `Bearer ${token}`;
+        res.redirect('/post');
+      })
     });
   },
   authentication: (req, res) => {
-    const results = validationResult(req);
-    if (!results.isEmpty()) {
-      res.render('login.ejs', { error: results.errors[0].msg, info: null });
+    const validationerrors = validationResult(req);
+    if (!validationerrors.isEmpty()) {
+      req.flash('error', validationerrors.errors[0].msg)
+      res.redirect('/login');
       return;
     }
     User.findUser(req.body.email, req.body.password, (error, result) => {
@@ -49,6 +57,7 @@ module.exports = {
         return;
       }
       const payload = {
+        id: result[0].id,
         name: result[0].name,
         email: result[0].email,
         password: result[0].password
@@ -67,8 +76,5 @@ module.exports = {
     delete req.session.accessToken;
     res.redirect('/login');
   },
-  post: (req, res) => {
-    res.setHeader('token', req.token);
-    res.render('post.ejs', { info: req.decoded.name });
-  },
+
 };

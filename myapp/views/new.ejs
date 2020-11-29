@@ -1,0 +1,70 @@
+<div id="flash-message"></div>
+  <div style=" width: 80%; margin: 30px auto;">
+    <form id="new-contents-form" >
+      <div class="form-group" style="margin-bottom: 20px;">
+        <label for="">タイトル</label>
+        <div class="row">
+          <div class="col-md-12">
+            <input type="text" class="form-control" name="title" value="" />
+          </div>
+        </div>
+      </div>
+      <div class="form-group" style="margin-bottom: 20px;">
+        <label for="">コンテンツ</label>
+        <div class="row">
+          <div class="col-md-12">
+            <textarea class="form-control" name="contents"></textarea>
+          </div>
+        </div>
+      </div>
+      <div class="form-group col-xs-5">
+        <input type="button" class="btn btn-primary w-30" value="新規投稿" onclick="contentsSubmit()" />
+      </div>
+    </form>
+  </div>
+<script>
+  const contentsForm = document.getElementById('new-contents-form');
+  const flashMessage = document.getElementById('flash-message');
+  const contentsSubmit = () => {
+    const data = new FormData(contentsForm);
+    const token = getToken();
+    fetch('/post/create', {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      method: 'POST',
+      body: data,
+    })
+      .then((res) => {
+        if (res.ok) {
+          return res.json();
+        } 
+      })
+      .then((msg) => {  
+        refleshMessage()     
+        createMessage(msg);
+      })
+      .catch((error) => {
+          location.href = '/post';
+      });
+  };
+  const getToken = () => {
+    let token = localStorage.getItem('token');
+    token = JSON.parse(token);
+    return token;
+  };
+  const createMessage = (msg) => {
+    const messageElement = document.createElement('div');
+    messageElement.classList.add('alert', 'alert-success');
+    messageElement.setAttribute('role', 'alert');
+    const p = document.createElement('p');
+    p.appendChild(document.createTextNode(msg));
+    messageElement.appendChild(p);
+    flashMessage.appendChild(messageElement);
+  };
+  const refleshMessage = () => {
+    while (flashMessage.firstChild) {
+        flashMessage.removeChild(flashMessage.firstChild)
+    }
+  }
+</script>

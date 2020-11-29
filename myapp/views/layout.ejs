@@ -33,7 +33,7 @@
           <a class="nav-link" href="/post">みんなの投稿</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="#">投稿</a>
+          <a class="nav-link" href="/post/new">投稿</a>
         </li>
         <% if (info) { %>
         <li class="nav-item dropdown">
@@ -45,7 +45,7 @@
             data-toggle="dropdown"
             aria-haspopup="true"
             aria-expanded="false"
-            ><%= info %>
+            ><%= info.name %>
           </a>
           <div
             class="dropdown-menu dropdown-menu-right"
@@ -60,7 +60,7 @@
             >
           </div>
         </li>
-        <% } else {%>
+        <% } else { %>
         <li class="nav-item">
           <a class="nav-link" href="/login">ログイン</a>
         </li>

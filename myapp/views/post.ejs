@@ -1,4 +1,16 @@
-<h1>post</h1>
+<div style="width: 100%; margin: auto; ">
+  <% posts.forEach((post) => { %>
+    <div style=" width: 80%; margin: 16px auto; padding: 5px; border: 1px solid;">
+      <h4 style="margin-top: 10px; word-wrap: break-word;"><%= post.title %></h4>
+      <div style="word-wrap: break-word;"><%= post.contents %></div>
+      <p>投稿者: <%= users[post.user_id - 1].name %></p>
+      <% if (info.id === post.user_id) { %>
+        <input id="<%= post.id %>" class="btn-info edit-button" type="button" style="border-radius: 45%;" value="編集" >
+        <input type="button" class="btn-outline-danger" style="border-radius: 45%;" value="削除">
+      <% } %>   
+    </div>
+  <% }) %>
+</div>
 
 <script>
   const client = new XMLHttpRequest();
@@ -8,12 +20,23 @@
   client.onreadystatechange = function () {
     if (client.readyState == 4) {
       const token = client.getResponseHeader('token');
-      saveData(token)
+      saveData(token);
     }
   };
+  const editbuttons = document.querySelectorAll('.edit-button');
   const saveData = (token) => {
-    token = 'Bearer ' + token;
     const jsonData = JSON.stringify(token);
     localStorage.setItem('token', jsonData);
   };
+  const goEditPage = (id) => {
+    location.href = `/post/edit/${id}`;
+  }
+  if (editbuttons) {
+    editbuttons.forEach((button) => {
+      button.addEventListener('click', (event) => {
+        goEditPage(event.target.id);
+      })
+
+    })
+  }
 </script>
