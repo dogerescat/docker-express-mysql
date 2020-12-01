@@ -1,9 +1,32 @@
 <div style="width: 100%; margin: auto">
-  <% posts.forEach((post) => { %>
+  <%posts.forEach((post)=>{%>
   <div style="width: 80%; margin: 16px auto; padding: 5px; border: 1px solid">
-    <h4 style="margin-top: 10px; word-wrap: break-word"><%= post.title %></h4>
-    <div style="word-wrap: break-word"><%= post.contents %></div>
-    <p>投稿者: <%= users[post.user_id - 1].name %></p>
+    <h4 style="margin-top: 10px; word-wrap: break-word"><%=post.title%></h4>
+    <div style="word-wrap: break-word"><%=post.contents%></div>
+    <p>投稿者:<%=users[post.user_id - 1].name%></p>
+    <% let likeCounter = 0 %> 
+    <% let myLike = false %> 
+    <% likes.forEach((like) => { %>
+      <% if (like.post_id === post.id) { %>
+        <% likeCounter = like['count(post_id)'] %> 
+      <% } %> 
+    <% }) %> 
+    <% likeList.forEach((e) => { %>
+      <% if (e.user_id === info.id && e.post_id === post.id) { %> 
+        <% myLike = true %> 
+      <% } %> 
+    <% }) %> 
+    <% if (myLike) { %>
+      <div>
+        <i id="<%= post.id %> " class="fas fa-heart like-button"></i>
+        <span class="like-count"><span><%=likeCounter%></span></span>
+      </div>
+    <% } else { %>  
+      <div>
+        <i id="<%= post.id %>" class="far fa-heart like-button"></i>
+        <span class="like-count"><span><%=likeCounter%></span></span>
+      </div>
+    <% } %> 
     <% if (info.id === post.user_id) { %>
     <input
       id="<%= post.id %>"
@@ -13,8 +36,9 @@
       value="編集"
     />
     <input
+      id="<%= post.id %> "
       type="button"
-      class="btn-outline-danger"
+      class="btn-outline-danger delete-button"
       style="border-radius: 45%"
       value="削除"
     />
@@ -36,7 +60,10 @@
   };
   
   const editbuttons = document.querySelectorAll('.edit-button');
+  const deletebuttons = document.querySelectorAll('.delete-button');
+  const likeCounter = document.querySelectorAll('.like-count');
 
+  const likeButtons = document.querySelectorAll('.like-button');
   const saveData = (token) => {
     const jsonData = JSON.stringify(token);
     localStorage.setItem('token', jsonData);
@@ -46,10 +73,114 @@
     location.href = `/post/edit/${id}`;
   };
 
+  const deleteContents = (id) => {
+    const token = getToken();
+    const option = {
+      method: 'DELETE',
+      headers: {
+        authorization: `Bearer ${token}`
+      }
+    }
+    fetch(`/post/delete/${id}`,option)
+    .then((res) => {
+      location.href = '/post';
+    })
+    .catch((error) => {
+      console.log(error);
+    })
+  }
+
+  const switchLikeCounter = (target, i) => {
+    const token = getToken();
+    const option = {
+      headers: {
+        authorization: `Bearer ${token}`
+      }
+    }
+
+    if (target.classList.contains('fas')) {
+      option.method = 'DELETE';
+      fetch(`/like/delete/${target.id}`, option)
+      .then((res) => {
+        return res.json();
+      })
+      .then((data) => {
+        let isChildElement = false;
+        const id = parseInt(target.id);
+        data.forEach(element => {
+          if (element.post_id === id) {
+            swichIcon(target);
+            createLikeNumber(element['count(post_id)'], i);
+            isChildElement = true;
+          } 
+        });
+        if (!isChildElement) {
+          swichIcon(target);
+          createLikeNumber(0, i);
+        }
+      })
+      likeCounter[i].removeChild(likeCounter[i].firstElementChild);
+    } else {
+      option.method = 'POST'
+      fetch(`/like/create/${target.id}`, option)
+      .then((res) => {
+        return res.json();
+      })
+      .then((data) => {
+        const id = parseInt(target.id);
+        data.forEach(element => {
+          if (element.post_id === id) {
+            swichIcon(target);
+            createLikeNumber(element['count(post_id)'], i);
+          }
+        });
+      });
+      likeCounter[i].removeChild(likeCounter[i].firstElementChild);
+    }
+  }
+
+  const createLikeNumber = (number, id) => {
+    const e = document.createElement('span');
+    e.appendChild(document.createTextNode(number));
+    likeCounter[id].appendChild(e);
+  }
+
+  const swichIcon = (e) => {
+    if (e.classList.contains('fas') ) {
+      e.classList.remove('fas');
+      e.classList.add('far');
+    } else {
+      e.classList.remove('far');
+      e.classList.add('fas');
+    }
+  }
+
+  const getToken = () => {
+    let token = localStorage.getItem('token');
+    token = JSON.parse(token);
+    return token;
+  };
+
   if (editbuttons) {
     editbuttons.forEach((button) => {
       button.addEventListener('click', (event) => {
         goEditPage(event.target.id);
+      });
+    });
+  }
+
+  if (deletebuttons) {
+    deletebuttons.forEach((button) => {
+      button.addEventListener('click', (event) => {
+        deleteContents(event.target.id);
+      });
+    });
+  }
+
+  if (likeButtons) {
+    likeButtons.forEach((button, index) => {
+      button.addEventListener('click', (event) => {
+        switchLikeCounter(event.target, index);
       });
     });
   }

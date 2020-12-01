@@ -1,5 +1,6 @@
 const Post = require('../model/post');
 const User = require('../model/user');
+const Like = require('../model/like');
 const { validationResult } = require('express-validator');
 
 module.exports = {
@@ -14,11 +15,25 @@ module.exports = {
           res.redirect('/post');
           return;
         }
-        res.setHeader('token', req.token);
-        res.render('post.ejs', {
-          info: req.decoded,
-          posts: postResult,
-          users: userResult,
+        Like.getCounter((erro, likeResult) => {
+          if (erro) {
+            res.redirect('/post');
+            return;
+          }
+          Like.getAll((e, result) => {
+            if (e) {
+              res.redirect('/post');
+              return;
+            }
+            res.setHeader('token', req.token);
+            res.render('post.ejs', {
+              info: req.decoded,
+              posts: postResult,
+              users: userResult,
+              likes: likeResult,
+              likeList: result
+            });
+          })
         });
       });
     });
@@ -60,4 +75,17 @@ module.exports = {
       res.json();
     });
   },
+  delete: (req, res) => {
+    Post.delete(req.params.id, (error) => {
+      if (error) {
+        return;
+      }
+      Like.deletePostId(req.params.id, (err) => {
+        if (err) {
+          return;
+        }
+        res.json();
+      })
+    })
+  }
 };

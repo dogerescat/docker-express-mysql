@@ -1,11 +1,10 @@
 const express = require('express');
 const router = express.Router();
-const post = require('../controller/post.controller');
+const like = require('../controller/like.controller');
 const JwtStrategy = require('passport-jwt').Strategy;
 const ExtractJwt = require('passport-jwt').ExtractJwt;
 const passport = require('passport');
 const User = require('../model/user');
-const contentsValidation = require('../contentsValidator');
 const auth = require('../middleware/auth');
 require('dotenv').config();
 const env = process.env;
@@ -40,11 +39,6 @@ passport.use(
   })
 );
 
-router.get('/',auth, post.get);
-router.get('/new', auth, post.new);
-router.get('/edit/:id', auth, post.edit);
-router.post('/create', auth, passport.authenticate('jwt', {session: false}), contentsValidation, post.create);
-router.post('/update/:id', auth, passport.authenticate('jwt', {session: false}), contentsValidation, post.update);
-router.delete('/delete/:id', auth, passport.authenticate('jwt', {session: false}), post.delete);
-
+router.post('/create/:id', auth, passport.authenticate('jwt', {session: false}), like.create);
+router.delete('/delete/:id',auth,passport.authenticate('jwt', {session: false}), like.delete);
 module.exports = router;

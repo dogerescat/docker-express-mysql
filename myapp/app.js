@@ -9,6 +9,7 @@ const bodyParser = require('body-parser');
 const passport = require('passport');
 const userRouter = require('./routes/user');
 const postRouter = require('./routes/post');
+const likeRouter = require('./routes/like');
 const app = express();
 const session = require('express-session');
 const flash = require('express-flash');
@@ -36,6 +37,7 @@ app.use(flash());
 
 app.use('/', userRouter);
 app.use('/post', postRouter);
+app.use('/like', likeRouter);
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
   next(createError(404));

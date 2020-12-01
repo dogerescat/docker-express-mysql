@@ -19,8 +19,8 @@
       <div class="row">
         <div class="col-md-12">
           <textarea name="contents" class="form-control">
-<%= contents %></textarea
-          >
+            <%= contents %>
+          </textarea>
         </div>
       </div>
     </div>
@@ -38,7 +38,7 @@
   const contentsForm = document.getElementById('edit-contents-form');
   const flashMessage = document.getElementById('flash-message');
   const contentsEdit = document.querySelector('.contents-edit');
-  const contentsUpdate = (id) => {
+  const updataContents = (id) => {
     const data = new FormData(contentsForm);
     const token = getToken();
     fetch(`/post/update/${id}`, {
@@ -85,6 +85,6 @@
   };
 
   contentsEdit.addEventListener('click', (event) => {
-    contentsUpdate(event.target.id);
+    updataContents(event.target.id);
   });
 </script>
