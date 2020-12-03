@@ -31,14 +31,23 @@ passport.use(
         }
         if (user) {
           return done(null, user);
-        } else {
-          return done(null, false);
         }
+        return done(null, false);
       }
     );
   })
 );
 
-router.post('/create/:id', auth, passport.authenticate('jwt', {session: false}), like.create);
-router.delete('/delete/:id',auth,passport.authenticate('jwt', {session: false}), like.delete);
+router.post(
+  '/create/:id',
+  auth,
+  passport.authenticate('jwt', { session: false }),
+  like.create
+);
+router.delete(
+  '/delete/:id',
+  auth,
+  passport.authenticate('jwt', { session: false }),
+  like.delete
+);
 module.exports = router;

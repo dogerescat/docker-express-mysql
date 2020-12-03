@@ -72,9 +72,9 @@
     const messageElement = document.createElement('div');
     messageElement.classList.add('alert', 'alert-success');
     messageElement.setAttribute('role', 'alert');
-    const p = document.createElement('p');
-    p.appendChild(document.createTextNode(msg));
-    messageElement.appendChild(p);
+    const element = document.createElement('element');
+    element.appendChild(document.createTextNode(msg));
+    messageElement.appendChild(element);
     flashMessage.appendChild(messageElement);
   };
 

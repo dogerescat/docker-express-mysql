@@ -120,39 +120,40 @@
         }
       })
       likeCounter[i].removeChild(likeCounter[i].firstElementChild);
-    } else {
-      option.method = 'POST'
-      fetch(`/like/create/${target.id}`, option)
-      .then((res) => {
-        return res.json();
-      })
-      .then((data) => {
-        const id = parseInt(target.id);
-        data.forEach(element => {
-          if (element.post_id === id) {
-            swichIcon(target);
-            createLikeNumber(element['count(post_id)'], i);
-          }
-        });
-      });
-      likeCounter[i].removeChild(likeCounter[i].firstElementChild);
+      return;
     }
+    option.method = 'POST'
+    fetch(`/like/create/${target.id}`, option)
+    .then((res) => {
+      return res.json();
+    })
+    .then((data) => {
+      const id = parseInt(target.id);
+      data.forEach(element => {
+        if (element.post_id === id) {
+          swichIcon(target);
+          createLikeNumber(element['count(post_id)'], i);
+        }
+      });
+    });
+    likeCounter[i].removeChild(likeCounter[i].firstElementChild);
   }
 
   const createLikeNumber = (number, id) => {
-    const e = document.createElement('span');
-    e.appendChild(document.createTextNode(number));
-    likeCounter[id].appendChild(e);
+    const element = document.createElement('span');
+    element.appendChild(document.createTextNode(number));
+    likeCounter[id].appendChild(element);
   }
 
   const swichIcon = (e) => {
     if (e.classList.contains('fas') ) {
       e.classList.remove('fas');
       e.classList.add('far');
-    } else {
-      e.classList.remove('far');
-      e.classList.add('fas');
-    }
+      return;
+    } 
+    e.classList.remove('far');
+    e.classList.add('fas');
+    
   }
 
   const getToken = () => {
